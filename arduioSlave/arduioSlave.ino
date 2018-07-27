@@ -14,14 +14,16 @@ boolean storeData = false;
 boolean commandRecv = false;
 char dataRecv[20];
 int dataIndex = 0;
+unsigned long publishTimer,now;
 
 Servo myServo;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Hi there");
+  //Serial.println("Hi there");
   pinMode(13,OUTPUT);
   myServo.attach(9);
+  publishTimer = millis();
 }//end of setup
 
 void loop() {
@@ -31,7 +33,7 @@ void loop() {
 
   if(commandRecv){
     commandRecv = false;
-    Serial.println(dataRecv);
+    //Serial.println(dataRecv);
     if(dataRecv[0] == 'L'){
       digitalWrite(13,getNumber(dataRecv,sizeof(dataRecv)));
     }else if(dataRecv[0] == 'S'){
@@ -42,7 +44,14 @@ void loop() {
       delay(2);
     }//end of for
     }//end of ifElse
-  }
+  }//end of command recv
+
+  now = millis();
+ if(now - publishTimer > 4000) {
+  publishTimer = now;
+  Serial.print(analogRead(A0));
+  Serial.print('\n');
+ }
 }//end of loop
 
 void processRecvChar(char recvChar){
@@ -74,7 +83,7 @@ unsigned int getNumber(char* dataRecv,int dataSize){
   }//end of for
 
   number[++numberIndex] = NULL;
-  Serial.println(number);
+  //Serial.println(number);
   return atoi(number);
 }//end of getNumber Fcn
 
