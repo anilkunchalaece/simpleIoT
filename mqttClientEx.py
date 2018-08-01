@@ -10,7 +10,7 @@ from Adafruit_IO import *
 import serial
 import time
 
-ser = serial.Serial('/dev/ttyACM0',115200)
+ser = serial.Serial('COM11',115200)
 mqtt = MQTTClient('anilkunchalaece','e996656b9fe54f9fa298816e1fb9398f')
 
 
@@ -27,16 +27,16 @@ def disconnected(mqtt) :
 
 def message(mqtt,feedId,payload):
     print("received a msg")
-    print(feedId)
-    print(payload) 
+    # print(feedId)
+    # print(payload) 
     if (feedId == 'servoControl') :
-        strToSend = '!S'+payload.encode('ascii','ignore')+'@'
-        ser.write(strToSend)
+        strToSend = '!S'+payload+'@'
+        ser.write(strToSend.encode('utf-8'))
     elif (feedId == 'ledControl') :
         if payload == 'ON' :
-            strToSend = '!L1@'
+            strToSend = '!L1@'.encode('utf-8')
         else :
-            strToSend = '!L0@'
+            strToSend = '!L0@'.encode('utf-8')
         ser.write(strToSend)
 
 
@@ -50,10 +50,10 @@ mqtt.loop_background()
 while True :
     while ser.in_waiting :
         data = ser.readline()
-        print data
+        print (data)
         try :
             mqtt.publish('potOutput',int(data.strip()))
-            print "published"
+            print ("published")
             time.sleep(2)
         except :
-            print "unable to do it"
+            print("unable to do it")
